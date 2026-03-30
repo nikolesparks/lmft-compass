@@ -42,7 +42,7 @@ export function WeeklyLogForm({ onSubmit }: WeeklyLogFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Log Weekly Hours</CardTitle>
+        <CardTitle className="text-2xl">Log Weekly Hours</CardTitle>
         <CardDescription>Record your hours for the week. Submitting recalculates your live projection.</CardDescription>
       </CardHeader>
       <CardContent>
