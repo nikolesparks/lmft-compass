@@ -102,6 +102,15 @@
   h1, h2, h3 {
     font-family: 'Instrument Serif', Georgia, serif;
   }
+
+  /* Make native input icons (calendar, number spinners, etc.) white */
+  input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+  input::-webkit-inner-spin-button,
+  input::-webkit-outer-spin-button {
+    filter: invert(1);
+  }
 }
 
 @layer utilities {
