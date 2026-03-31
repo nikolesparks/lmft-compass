@@ -70,7 +70,7 @@ export default function Index() {
       <header className="border-b bg-card">
         <div className="container mx-auto flex items-center justify-between py-4 px-4">
           <div>
-            <h1 className="text-2xl tracking-tight font-serif font-normal">AMFT Hour Tracker</h1>
+            <h1 className="text-2xl tracking-tight font-serif-display font-normal">AMFT Hour Tracker</h1>
             <p className="text-sm text-muted-foreground">California BBS Licensure Progress</p>
           </div>
           <div className="flex items-center gap-2">
