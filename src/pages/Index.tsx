@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 
 export default function Index() {
   const [state, setState] = useState<AppState>(loadState);
+  const [editingLogId, setEditingLogId] = useState<string | null>(null);
 
   useEffect(() => {
     saveState(state);
