@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { WeeklyLog } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,9 +7,11 @@ import { Label } from '@/components/ui/label';
 
 interface WeeklyLogFormProps {
   onSubmit: (log: WeeklyLog) => void;
+  editingLog?: WeeklyLog | null;
+  onCancelEdit?: () => void;
 }
 
-export function WeeklyLogForm({ onSubmit }: WeeklyLogFormProps) {
+export function WeeklyLogForm({ onSubmit, editingLog, onCancelEdit }: WeeklyLogFormProps) {
   const today = new Date();
   const monday = new Date(today);
   monday.setDate(today.getDate() - today.getDay() + 1);
@@ -21,9 +23,29 @@ export function WeeklyLogForm({ onSubmit }: WeeklyLogFormProps) {
   const [supervisionHours, setSupervisionHours] = useState(0);
   const [notes, setNotes] = useState('');
 
+  useEffect(() => {
+    if (editingLog) {
+      setWeekDate(editingLog.weekDate);
+      setTotalHours(editingLog.totalHours);
+      setDirectClientHours(editingLog.directClientHours);
+      setCouplesFamilyHours(editingLog.couplesFamilyHours);
+      setSupervisionHours(editingLog.supervisionHours);
+      setNotes(editingLog.notes);
+    }
+  }, [editingLog]);
+
+  const resetForm = () => {
+    setWeekDate(monday.toISOString().split('T')[0]);
+    setTotalHours(0);
+    setDirectClientHours(0);
+    setCouplesFamilyHours(0);
+    setSupervisionHours(0);
+    setNotes('');
+  };
+
   const handleSubmit = () => {
     const log: WeeklyLog = {
-      id: crypto.randomUUID(),
+      id: editingLog?.id ?? crypto.randomUUID(),
       weekDate,
       totalHours,
       directClientHours,
@@ -32,18 +54,25 @@ export function WeeklyLogForm({ onSubmit }: WeeklyLogFormProps) {
       notes,
     };
     onSubmit(log);
-    setTotalHours(0);
-    setDirectClientHours(0);
-    setCouplesFamilyHours(0);
-    setSupervisionHours(0);
-    setNotes('');
+    resetForm();
   };
+
+  const handleCancel = () => {
+    resetForm();
+    onCancelEdit?.();
+  };
+
+  const isEditing = !!editingLog;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-2xl">Log Weekly Hours</CardTitle>
-        <CardDescription>Record your hours for the week. Submitting recalculates your live projection.</CardDescription>
+        <CardTitle className="text-2xl">{isEditing ? 'Edit Weekly Log' : 'Log Weekly Hours'}</CardTitle>
+        <CardDescription>
+          {isEditing
+            ? 'Update this week\'s entry. Saving recalculates your live projection.'
+            : 'Record your hours for the week. Submitting recalculates your live projection.'}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -72,7 +101,14 @@ export function WeeklyLogForm({ onSubmit }: WeeklyLogFormProps) {
             <Input value={notes} onChange={e => setNotes(e.target.value)} placeholder="e.g. Holiday week" />
           </div>
         </div>
-        <Button className="mt-4 w-full" onClick={handleSubmit}>Submit Weekly Log</Button>
+        <div className="mt-4 flex gap-2">
+          <Button className="flex-1" onClick={handleSubmit}>
+            {isEditing ? 'Save Changes' : 'Submit Weekly Log'}
+          </Button>
+          {isEditing && (
+            <Button variant="outline" onClick={handleCancel}>Cancel</Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
