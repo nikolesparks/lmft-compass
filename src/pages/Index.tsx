@@ -111,18 +111,26 @@ export default function Index() {
           </TabsList>
 
           <TabsContent value="log" className="space-y-4">
-            <WeeklyLogForm onSubmit={handleWeeklyLog} />
+            <WeeklyLogForm
+              onSubmit={handleWeeklyLog}
+              editingLog={state.weeklyLogs.find(l => l.id === editingLogId) ?? null}
+              onCancelEdit={() => setEditingLogId(null)}
+            />
             {state.weeklyLogs.length > 0 && (
               <div className="rounded-lg border bg-card p-4">
                 <h3 className="text-sm font-medium text-muted-foreground mb-3">Recent Logs</h3>
                 <div className="space-y-2">
                   {[...state.weeklyLogs].reverse().slice(0, 10).map(log => (
-                    <div key={log.id} className="flex items-center justify-between text-sm border-b last:border-0 pb-2">
-                      <span className="font-medium">{new Date(log.weekDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                      <div className="flex gap-4 text-muted-foreground">
+                    <div key={log.id} className="flex items-center justify-between gap-4 text-sm border-b last:border-0 pb-2">
+                      <span className="font-medium shrink-0">{new Date(log.weekDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                      <div className="flex gap-4 text-muted-foreground flex-1">
                         <span>{log.totalHours}h total</span>
                         <span>{log.directClientHours}h direct</span>
                         <span>{log.couplesFamilyHours}h C/F</span>
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <Button variant="ghost" size="sm" onClick={() => setEditingLogId(log.id)}>Edit</Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteLog(log.id)}>Delete</Button>
                       </div>
                     </div>
                   ))}
