@@ -33,12 +33,25 @@ export default function Index() {
   }, []);
 
   const handleWeeklyLog = useCallback((log: WeeklyLog) => {
-    setState(prev => ({
-      ...prev,
-      weeklyLogs: [...prev.weeklyLogs, log],
-    }));
-    toast.success('Weekly hours logged. Live projection updated.');
+    setState(prev => {
+      const exists = prev.weeklyLogs.some(l => l.id === log.id);
+      return {
+        ...prev,
+        weeklyLogs: exists
+          ? prev.weeklyLogs.map(l => (l.id === log.id ? log : l))
+          : [...prev.weeklyLogs, log],
+      };
+    });
+    setEditingLogId(null);
+    toast.success('Weekly hours saved. Live projection updated.');
   }, []);
+
+  const handleDeleteLog = useCallback((id: string) => {
+    if (!confirm('Delete this weekly log? This cannot be undone.')) return;
+    setState(prev => ({ ...prev, weeklyLogs: prev.weeklyLogs.filter(l => l.id !== id) }));
+    if (editingLogId === id) setEditingLogId(null);
+    toast.success('Weekly log deleted.');
+  }, [editingLogId]);
 
   const handleSettingsSave = useCallback((updated: OnboardingData) => {
     setState(prev => ({ ...prev, onboarding: updated }));
