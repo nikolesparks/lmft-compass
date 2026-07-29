@@ -8,6 +8,7 @@ import { DashboardSummary } from '@/components/DashboardSummary';
 import { WeeklyLogForm } from '@/components/WeeklyLogForm';
 import { RequirementTable } from '@/components/RequirementTable';
 import { SettingsPanel } from '@/components/SettingsPanel';
+import { TargetPacing } from '@/components/TargetPacing';
 import { ProgressVisualization } from '@/components/ProgressVisualization';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -152,6 +153,15 @@ export default function Index() {
 
           <TabsContent value="progress">
             <ProgressVisualization requirements={requirements} />
+          </TabsContent>
+
+          <TabsContent value="target">
+            <TargetPacing
+              requirements={requirements}
+              weeklyLogs={state.weeklyLogs}
+              targetDate={state.targetDate ?? null}
+              onSave={handleTargetDate}
+            />
           </TabsContent>
 
           <TabsContent value="settings">
