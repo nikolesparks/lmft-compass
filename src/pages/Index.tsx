@@ -28,8 +28,14 @@ export default function Index() {
       weeklyLogs: [],
       originalProjection,
       isOnboarded: true,
+      targetDate: null,
     });
     toast.success('Setup complete! Your projections are ready.');
+  }, []);
+
+  const handleTargetDate = useCallback((date: string | null) => {
+    setState(prev => ({ ...prev, targetDate: date }));
+    toast.success(date ? 'Target date updated.' : 'Target date cleared.');
   }, []);
 
   const handleWeeklyLog = useCallback((log: WeeklyLog) => {
