@@ -8,6 +8,7 @@ import { DashboardSummary } from '@/components/DashboardSummary';
 import { WeeklyLogForm } from '@/components/WeeklyLogForm';
 import { RequirementTable } from '@/components/RequirementTable';
 import { SettingsPanel } from '@/components/SettingsPanel';
+import { TargetPacing } from '@/components/TargetPacing';
 import { ProgressVisualization } from '@/components/ProgressVisualization';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -28,8 +29,14 @@ export default function Index() {
       weeklyLogs: [],
       originalProjection,
       isOnboarded: true,
+      targetDate: null,
     });
     toast.success('Setup complete! Your projections are ready.');
+  }, []);
+
+  const handleTargetDate = useCallback((date: string | null) => {
+    setState(prev => ({ ...prev, targetDate: date }));
+    toast.success(date ? 'Target date updated.' : 'Target date cleared.');
   }, []);
 
   const handleWeeklyLog = useCallback((log: WeeklyLog) => {
@@ -103,10 +110,11 @@ export default function Index() {
         />
 
         <Tabs defaultValue="log" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="log">Weekly Log</TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="progress">Progress</TabsTrigger>
+            <TabsTrigger value="target">Target</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
@@ -145,6 +153,15 @@ export default function Index() {
 
           <TabsContent value="progress">
             <ProgressVisualization requirements={requirements} />
+          </TabsContent>
+
+          <TabsContent value="target">
+            <TargetPacing
+              requirements={requirements}
+              weeklyLogs={state.weeklyLogs}
+              targetDate={state.targetDate ?? null}
+              onSave={handleTargetDate}
+            />
           </TabsContent>
 
           <TabsContent value="settings">

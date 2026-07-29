@@ -7,6 +7,7 @@ const defaultState: AppState = {
   weeklyLogs: [],
   originalProjection: null,
   isOnboarded: false,
+  targetDate: null,
 };
 
 export function loadState(): AppState {

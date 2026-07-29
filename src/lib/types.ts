@@ -49,6 +49,7 @@ export interface AppState {
   weeklyLogs: WeeklyLog[];
   originalProjection: Projection | null;
   isOnboarded: boolean;
+  targetDate: string | null;
 }
 
 export const REQUIREMENTS = {
