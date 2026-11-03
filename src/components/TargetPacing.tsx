@@ -138,34 +138,25 @@ export function TargetPacing({ requirements, weeklyLogs, targetDate, onSave }: T
         </Card>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">How the Flags Are Calculated</CardTitle>
-          <CardDescription>
-            Weeks left = (target date − today) ÷ 7. Needed / week = remaining hours ÷ weeks left.
-            A category is 🟢 when your recent {RECENT_WINDOW}-week average ≥ needed / week, otherwise 🔴.
-            Supervision weeks accrue one per logged week.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {p?.feasible && (
-            <div className="space-y-2 text-sm">
-              {p.rows.map(r => (
-                <div key={r.label} className="rounded-md border p-3 font-mono text-xs leading-relaxed">
-                  <div className="font-sans text-sm font-medium mb-1">{r.label}</div>
-                  {r.met ? <span>Remaining = 0 → requirement met ✅</span> : (
-                    <>
-                      <div>Needed = {r.remaining.toLocaleString()} ÷ {p.weeks.toFixed(1)} weeks = {r.needed.toFixed(1)} / week</div>
-                      <div>Recent avg ({p.recentCount} of last {RECENT_WINDOW} weeks) = {r.current.toFixed(1)} / week</div>
-                      <div>{r.current.toFixed(1)} {r.onTrack ? '≥' : '<'} {r.needed.toFixed(1)} → {r.onTrack ? '🟢 on track' : '🔴 off track'}</div>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+      <PacingCoach
+        context={{
+          today: new Date().toISOString().slice(0, 10),
+          savedTargetDate: targetDate,
+          weeksUntilSavedTarget: p?.feasible ? +p.weeks.toFixed(1) : null,
+          loggedWeeksInAverage: p?.recentCount ?? logs.length,
+          categories: p?.rows.map(r => ({
+            label: r.label, required: r.required, accrued: r.accrued, remaining: r.remaining,
+            neededPerWeek: r.met ? 0 : +r.needed.toFixed(2), recentAvgPerWeek: +r.current.toFixed(2),
+            onTrack: r.onTrack, met: r.met, liveProjectedDate: r.liveProjectedDate,
+          })) ?? reqs.map(r => ({ label: r.label, remaining: r.remaining, liveProjectedDate: r.liveProjectedDate })),
+          whatIfTargetDate: w?.feasible ? whatIf : null,
+          settings,
+        }}
+      />
 
-          <div className="space-y-3 border-t pt-4">
+      <Card>
+        <CardContent className="space-y-6 pt-6">
+          <div className="space-y-3">
             <h4 className="text-sm font-medium">Try a different target date</h4>
             <p className="text-xs text-muted-foreground">Explore without changing your saved target.</p>
             <Input type="date" value={whatIf} onChange={e => setWhatIf(e.target.value)} className="w-52" />
