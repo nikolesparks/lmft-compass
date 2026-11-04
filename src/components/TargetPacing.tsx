@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PacingCoach } from '@/components/PacingCoach';
+import { OnboardingData } from '@/lib/types';
 import { Switch } from '@/components/ui/switch';
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
@@ -13,11 +15,12 @@ interface TargetPacingProps {
   weeklyLogs: WeeklyLog[];
   targetDate: string | null;
   onSave: (date: string | null) => void;
+  settings?: OnboardingData;
 }
 
 const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
-export function TargetPacing({ requirements, weeklyLogs, targetDate, onSave }: TargetPacingProps) {
+export function TargetPacing({ requirements, weeklyLogs, targetDate, onSave, settings }: TargetPacingProps) {
   const [draft, setDraft] = useState(targetDate ?? '');
   const [auto, setAuto] = useState(true);
   const [snapshot, setSnapshot] = useState({ requirements, weeklyLogs });

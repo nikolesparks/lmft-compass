@@ -161,6 +161,7 @@ export default function Index() {
               weeklyLogs={state.weeklyLogs}
               targetDate={state.targetDate ?? null}
               onSave={handleTargetDate}
+              settings={state.onboarding}
             />
           </TabsContent>
 

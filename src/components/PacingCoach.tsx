@@ -63,7 +63,7 @@ export function PacingCoach({ context }: PacingCoachProps) {
         </Button>
         {error && <p className="text-sm text-destructive">{error}</p>}
         {answer && (
-          <div className="rounded-md border bg-muted/30 p-4 text-sm whitespace-pre-wrap leading-relaxed">{answer}</div>
+          <div className="rounded-md border bg-muted/30 p-4 text-sm whitespace-pre-wrap leading-relaxed">{answer.replace(/\*\*/g, '')}</div>
         )}
         <p className="text-xs text-muted-foreground">Your pacing numbers are sent to Lovable AI only when you ask a question.</p>
       </CardContent>

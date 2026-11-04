@@ -1,0 +1,1 @@
+- AI pacing assistant runs in the `pacing-coach` edge function via Lovable AI Gateway; the browser sends only the pacing snapshot per question — keeps the API key server-side and user data in localStorage.
