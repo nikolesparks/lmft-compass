@@ -9,6 +9,7 @@ import { WeeklyLogForm } from '@/components/WeeklyLogForm';
 import { RequirementTable } from '@/components/RequirementTable';
 import { SettingsPanel } from '@/components/SettingsPanel';
 import { TargetPacing } from '@/components/TargetPacing';
+import { ScenarioStudio } from '@/components/ScenarioStudio';
 import { ProgressVisualization } from '@/components/ProgressVisualization';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -110,11 +111,12 @@ export default function Index() {
         />
 
         <Tabs defaultValue="log" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="log">Weekly Log</TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="progress">Progress</TabsTrigger>
             <TabsTrigger value="target">Target</TabsTrigger>
+            <TabsTrigger value="scenarios">Scenarios</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
@@ -163,6 +165,10 @@ export default function Index() {
               onSave={handleTargetDate}
               settings={state.onboarding}
             />
+          </TabsContent>
+
+          <TabsContent value="scenarios">
+            <ScenarioStudio settings={state.onboarding} weeklyLogs={state.weeklyLogs} targetDate={state.targetDate ?? null} />
           </TabsContent>
 
           <TabsContent value="settings">
