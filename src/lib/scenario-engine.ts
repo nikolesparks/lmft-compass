@@ -7,7 +7,7 @@ export const BBS_SOURCE = 'https://www.bbs.ca.gov/pdf/publications/lmft_handbook
 const WEEK = 7 * 86400000;
 const positive = (n: number) => Number.isFinite(n) ? Math.max(0, n) : 0;
 const iso = (n: number) => new Date(n).toISOString().slice(0, 10);
-export const formatScenarioDate = (d: string | null) => d ? new Date(`${d}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not reachable';
+export const formatScenarioDate = (d: string | null) => d ? new Date(`${d}T12:00:00`).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : 'Not reachable';
 
 export function reviewHistory(onboarding: OnboardingData, logs: WeeklyLog[], review: HistoricalReview): QualifyingBalance {
   const raw = positive(onboarding.accruedTotal) + logs.reduce((s, l) => s + positive(l.totalHours), 0);

@@ -1,6 +1,7 @@
 import { HistoricalReview, Scenario } from './scenario-types';
 
-const KEY = 'lmft-scenario-studio-v1';
+// v2: sample schedules from v1 are dropped; studio starts from the user's real logs.
+const KEY = 'lmft-scenario-studio-v2';
 export interface StudioState { scenarios: Scenario[]; review: HistoricalReview }
 export const emptyReview: HistoricalReview = { verified: false, training: 0, supervision: 0, other: 0, individualWeeks: 0 };
 export function loadStudio(): StudioState {

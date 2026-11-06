@@ -18,11 +18,7 @@ const COLORS = ['hsl(var(--primary))', 'hsl(160 60% 50%)', 'hsl(35 90% 60%)', 'h
 const today = () => new Date().toISOString().slice(0, 10);
 const newId = () => Math.random().toString(36).slice(2, 10);
 
-const presets = (base: Scenario): Scenario[] => [
-  { ...base, id: newId(), name: 'Steady caseload', training: 2, individualSupervision: 1, groupSupervision: 2, trainingVerified: true },
-  { ...base, id: newId(), name: 'Increase caseload', direct: base.direct + 4, family: base.family + 2, individualSupervision: 2, groupSupervision: 2, training: 1, trainingVerified: true },
-  { ...base, id: newId(), name: 'Part-time', direct: Math.max(4, base.direct / 2), family: Math.max(1, base.family / 2), individualSupervision: 1, groupSupervision: 0, training: 0 },
-];
+const TEMPLATES = [-2, 2, 4];
 
 const diffText = (d: number | null) => d === null ? '—' : d === 0 ? 'Same day' : `${Math.abs(Math.round(d / 7))} wk ${d > 0 ? 'later' : 'earlier'}`;
 
@@ -40,9 +36,7 @@ export function ScenarioStudio({ settings, weeklyLogs, targetDate }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [shift, setShift] = useState(0);
 
-  useEffect(() => {
-    if (studio.scenarios.length === 0) setStudio(s => ({ ...s, scenarios: presets(current) }));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const sessionHrs = Math.max(0.25, settings.avgSessionLengthMinutes / 60);
   useEffect(() => { if (!saveStudio(studio)) toast.error('Could not save scenarios in this browser.'); }, [studio]);
 
   const now = today();
@@ -55,7 +49,12 @@ export function ScenarioStudio({ settings, weeklyLogs, targetDate }: Props) {
   const selectedResult = results.find(x => x.s.id === selected?.id)?.r;
 
   const update = (id: string, patch: Partial<Scenario>) => setStudio(st => ({ ...st, scenarios: st.scenarios.map(s => s.id === id ? { ...s, ...patch } : s) }));
-  const add = () => { const s = { ...current, id: newId(), name: `Scenario ${studio.scenarios.length + 1}` }; setStudio(st => ({ ...st, scenarios: [...st.scenarios, s] })); setEditingId(s.id); };
+  const add = (delta = 0) => {
+    const direct = Math.max(0, current.direct + delta * sessionHrs);
+    const s = { ...current, id: newId(), direct: Math.round(direct * 10) / 10, family: Math.min(current.family, direct),
+      name: delta ? `Current pace ${delta > 0 ? '+' : ''}${delta} sessions/wk` : `My schedule ${studio.scenarios.length + 1}` };
+    setStudio(st => ({ ...st, scenarios: [...st.scenarios, s] })); setEditingId(s.id);
+  };
   const duplicate = (s: Scenario) => setStudio(st => ({ ...st, scenarios: [...st.scenarios, { ...s, id: newId(), name: `${s.name} (copy)` }] }));
   const remove = (id: string) => { if (confirm('Delete this scenario?')) setStudio(st => ({ ...st, scenarios: st.scenarios.filter(s => s.id !== id) })); };
 
@@ -87,7 +86,7 @@ export function ScenarioStudio({ settings, weeklyLogs, targetDate }: Props) {
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-serif-display font-normal tracking-tight">Scenario Studio</CardTitle>
-          <CardDescription>Compare hypothetical weekly schedules. Your logged history is never changed. Rules follow the <a className="underline" href={BBS_SOURCE} target="_blank" rel="noreferrer">BBS handbook</a>.</CardDescription>
+          <CardDescription>Build weekly schedules starting from your real logged pace and compare them. Your logged history is never changed. Rules follow the <a className="underline" href={BBS_SOURCE} target="_blank" rel="noreferrer">BBS handbook</a>.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-4 text-sm">
@@ -119,16 +118,20 @@ export function ScenarioStudio({ settings, weeklyLogs, targetDate }: Props) {
       <Card>
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <CardTitle className="text-xl font-serif-display font-normal">Compare scenarios</CardTitle>
-          <Button size="sm" onClick={add}>New scenario</Button>
+          <div className="flex flex-wrap gap-2 justify-end">
+            {TEMPLATES.map(d => <Button key={d} size="sm" variant="outline" onClick={() => add(d)}>{d > 0 ? '+' : ''}{d} sessions/wk</Button>)}
+            <Button size="sm" onClick={() => add()}>New schedule</Button>
+          </div>
         </CardHeader>
         <CardContent className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="text-left text-muted-foreground">
               <tr className="border-b">
                 <th className="py-2 pr-3">Scenario</th>
+                <th className="py-2 pr-3">+Sessions/wk</th>
                 {Object.keys(currentResult.dates).map(k => <th key={k} className="py-2 pr-3 font-normal">{k}</th>)}
                 <th className="py-2 pr-3">Completion</th><th className="py-2 pr-3">Limiting</th>
-                <th className="py-2 pr-3">vs target</th><th className="py-2 pr-3">vs current</th><th className="py-2 pr-3">+Sessions/wk</th><th />
+                <th className="py-2 pr-3">vs target</th><th className="py-2 pr-3">vs current</th><th />
               </tr>
             </thead>
             <tbody>
@@ -159,6 +162,10 @@ export function ScenarioStudio({ settings, weeklyLogs, targetDate }: Props) {
             <CardContent className="space-y-4">
               <div className="space-y-1"><Label>Name</Label><Input value={s.name} onChange={e => update(s.id, { name: e.target.value })} /></div>
               <div className="grid gap-3 sm:grid-cols-4">
+                <div className="space-y-1">
+                  <Label className="text-xs">Client sessions/wk ({settings.avgSessionLengthMinutes} min)</Label>
+                  <Input type="number" min={0} step="1" value={Math.round(s.direct / sessionHrs * 10) / 10} onChange={e => { const direct = Number(e.target.value) * sessionHrs; update(s.id, { direct, family: Math.min(s.family, direct) }); }} />
+                </div>
                 {FIELDS.map(([k, label]) => (
                   <div key={k} className="space-y-1">
                     <Label className="text-xs">{label}</Label>
@@ -244,12 +251,12 @@ function ResultRow({ name, r, actions }: { name: string; r: ReturnType<typeof pr
   return (
     <tr className="border-b last:border-0 align-top">
       <td className="py-2 pr-3 font-medium">{name}{r.warnings.length > 0 && <span className="ml-1 text-xs text-muted-foreground" title={r.warnings.join('\n')}>⚠️</span>}</td>
+      <td className="py-2 pr-3">{r.additionalSessions ?? '—'}</td>
       {Object.values(r.dates).map((d, i) => <td key={i} className="py-2 pr-3 whitespace-nowrap">{formatScenarioDate(d)}</td>)}
       <td className="py-2 pr-3 whitespace-nowrap font-medium">{formatScenarioDate(r.completionDate)}</td>
       <td className="py-2 pr-3 text-xs">{r.completionDate ? r.limiting.join(', ') : 'Not enough supervision or hours'}</td>
       <td className="py-2 pr-3 whitespace-nowrap">{diffText(r.targetDifference)}</td>
       <td className="py-2 pr-3 whitespace-nowrap">{diffText(r.currentDifference)}</td>
-      <td className="py-2 pr-3">{r.additionalSessions ?? '—'}</td>
       <td className="py-2">{actions}</td>
     </tr>
   );
