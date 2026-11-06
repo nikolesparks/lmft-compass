@@ -113,7 +113,7 @@ export function currentPaceScenario(o: OnboardingData, logs: WeeklyLog[]): Scena
   const divisor = recent.length ? Math.min(8, Math.max(1, Math.floor((end - new Date(dated[0].weekDate).getTime()) / WEEK) + 1)) : 1;
   const avg = (fn: (l: WeeklyLog) => number) => recent.reduce((a, l) => a + positive(fn(l)), 0) / divisor;
   const direct = recent.length ? avg(l => l.directClientHours) : o.targetClientsPerWeek * o.avgSessionLengthMinutes / 60;
-  return { id: 'current', name: 'Current pace', direct, family: recent.length ? avg(l => l.couplesFamilyHours) : direct * o.couplesFamilyPercentage / 100, training: 0, other: recent.length ? avg(l => Math.max(0, l.totalHours - l.directClientHours - l.supervisionHours)) : 0, individualSupervision: 0, groupSupervision: recent.length ? avg(l => l.supervisionHours) : o.supervisionHoursPerWeek, workingWeeks: recent.length ? 52 : Math.max(1, 52 - o.holidayWeeksPerYear - o.vacationWeeksPerYear), cancellationRate: recent.length ? 0 : o.cancellationRate, trainingVerified: false, otherVerified: false };
+  return { id: 'current', name: 'Current pace', direct, family: recent.length ? avg(l => l.couplesFamilyHours) : direct * o.couplesFamilyPercentage / 100, training: 0, other: recent.length ? avg(l => Math.max(0, l.totalHours - l.directClientHours - l.supervisionHours)) : 0, individualSupervision: recent.length ? avg(l => l.supervisionHours) : o.supervisionHoursPerWeek, groupSupervision: 0, workingWeeks: recent.length ? 52 : Math.max(1, 52 - o.holidayWeeksPerYear - o.vacationWeeksPerYear), cancellationRate: recent.length ? 0 : o.cancellationRate, trainingVerified: false, otherVerified: false };
 }
 
 export function reallocateTraining(s: Scenario, hours: number): Scenario {

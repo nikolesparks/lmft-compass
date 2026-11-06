@@ -135,7 +135,7 @@ export function ScenarioStudio({ settings, weeklyLogs, targetDate }: Props) {
               <ResultRow name="Current pace" r={currentResult} />
               {results.map(({ s, r }) => (
                 <ResultRow key={s.id} name={s.name} r={r} actions={
-                  <div className="flex gap-1">
+                  <div className="flex flex-col items-start">
                     <Button variant="ghost" size="sm" onClick={() => setEditingId(editingId === s.id ? null : s.id)}>Edit</Button>
                     <Button variant="ghost" size="sm" onClick={() => duplicate(s)}>Duplicate</Button>
                     <Button variant="ghost" size="sm" onClick={() => remove(s.id)}>Delete</Button>
@@ -144,7 +144,7 @@ export function ScenarioStudio({ settings, weeklyLogs, targetDate }: Props) {
               ))}
             </tbody>
           </table>
-          <p className="text-xs text-muted-foreground mt-2">Current pace uses your recent logs conservatively: logged supervision is treated as group supervision and unverified hours are excluded, so it may show "Not reachable" for individual/triadic weeks.</p>
+          <p className="text-xs text-muted-foreground mt-2">Current pace uses your recent logs conservatively: logged supervision is assumed to be individual/triadic, and nonclinical hours other than supervision are excluded until verified.</p>
         </CardContent>
       </Card>
 
@@ -246,7 +246,7 @@ function ResultRow({ name, r, actions }: { name: string; r: ReturnType<typeof pr
       <td className="py-2 pr-3 font-medium">{name}{r.warnings.length > 0 && <span className="ml-1 text-xs text-muted-foreground" title={r.warnings.join('\n')}>⚠️</span>}</td>
       {Object.values(r.dates).map((d, i) => <td key={i} className="py-2 pr-3 whitespace-nowrap">{formatScenarioDate(d)}</td>)}
       <td className="py-2 pr-3 whitespace-nowrap font-medium">{formatScenarioDate(r.completionDate)}</td>
-      <td className="py-2 pr-3 text-xs">{r.limiting.join(', ') || '—'}</td>
+      <td className="py-2 pr-3 text-xs">{r.completionDate ? r.limiting.join(', ') : 'Not enough supervision or hours'}</td>
       <td className="py-2 pr-3 whitespace-nowrap">{diffText(r.targetDifference)}</td>
       <td className="py-2 pr-3 whitespace-nowrap">{diffText(r.currentDifference)}</td>
       <td className="py-2 pr-3">{r.additionalSessions ?? '—'}</td>
