@@ -95,23 +95,6 @@ export function ScenarioStudio({ settings, weeklyLogs, targetDate }: Props) {
             <Stat label="Direct clinical" value={`${balance.direct.toFixed(0)} / ${BBS.direct}`} />
             <Stat label="Nonclinical counted" value={`${balance.nonclinical.toFixed(0)} / ${BBS.nonclinical} cap`} />
           </div>
-          <div className="rounded-md border p-3 space-y-3">
-            <div className="flex items-center gap-2">
-              <Switch checked={studio.review.verified} onCheckedChange={v => setStudio(st => ({ ...st, review: { ...st.review, verified: v } }))} id="verify" />
-              <Label htmlFor="verify">I've reviewed my past nonclinical hours (with my supervisor's signed logs)</Label>
-            </div>
-            {studio.review.verified && (
-              <div className="grid gap-3 sm:grid-cols-4">
-                {(['supervision', 'training', 'other', 'individualWeeks'] as const).map(k => (
-                  <div key={k} className="space-y-1">
-                    <Label className="text-xs capitalize">{k === 'individualWeeks' ? 'Individual/triadic weeks' : `${k} hours`}</Label>
-                    <Input type="number" min={0} value={studio.review[k]} onChange={e => setStudio(st => ({ ...st, review: { ...st.review, [k]: Number(e.target.value) } }))} />
-                  </div>
-                ))}
-              </div>
-            )}
-            <ul className="text-xs text-muted-foreground list-disc pl-4 space-y-1">{balance.warnings.map(w => <li key={w}>{w}</li>)}</ul>
-          </div>
         </CardContent>
       </Card>
 

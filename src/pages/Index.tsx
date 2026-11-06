@@ -106,12 +106,13 @@ export default function Index() {
         <DashboardSummary
           originalProjection={state.originalProjection}
           liveProjection={liveProjection}
+          targetDate={state.targetDate ?? null}
           overallProgress={overallProgress}
           requirements={requirements}
         />
 
         <Tabs defaultValue="log" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="flex w-full justify-start overflow-x-auto h-auto flex-nowrap [&>button]:shrink-0 [&>button]:flex-1">
             <TabsTrigger value="log">Weekly Log</TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="progress">Progress</TabsTrigger>

@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 interface DashboardSummaryProps {
   originalProjection: Projection;
   liveProjection: Projection;
+  targetDate: string | null;
   overallProgress: number;
   requirements: RequirementStatus[];
 }
@@ -31,7 +32,7 @@ function StatusBadge({ status, isWeekConstraint }: { status: RequirementStatus['
   );
 }
 
-export function DashboardSummary({ originalProjection, liveProjection, overallProgress, requirements }: DashboardSummaryProps) {
+export function DashboardSummary({ liveProjection, targetDate, overallProgress, requirements }: DashboardSummaryProps) {
   return (
     <div className="space-y-6">
       {/* Top Stats */}
@@ -47,11 +48,13 @@ export function DashboardSummary({ originalProjection, liveProjection, overallPr
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Original Target Date</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Target Date</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold font-serif-display">
-              {new Date(originalProjection.licensureDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              {targetDate
+                ? new Date(`${targetDate}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                : <span className="text-base font-normal text-muted-foreground">Set one in the Target tab</span>}
             </div>
           </CardContent>
         </Card>
